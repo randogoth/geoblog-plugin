@@ -1,4 +1,4 @@
-# GeoBlog Plugin
+# GeoBlog Pelican Plugin
 
 This plugin scans for `Location: <latitude>, <longitude>` metadata in articles and displays them on a map using the included `archives.html` template. It also writes `articles.gpx` and `articles.kml` files with the same information for offline GPS devices and Apps.
 
@@ -25,3 +25,7 @@ Add location coordinates as decimal latitude and longitude values to your articl
 ```
 Location: 12.009621864420991, 79.81141615530888
 ```
+
+## Notes
+
+The generated map is based on [leaflet.js](https://leafletjs.com) and is highly customizable
