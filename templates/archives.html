@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="{{ DEFAULT_LANG }}">
+<head>
+	<base target="_top">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<title>{{ SITENAME }}</title>
+	
+	<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico" />
+    <link rel="stylesheet" href="{{ SITEURL }}/theme/local.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin=""/>
+    <style>
+        html, body { height: 100%; margin: 0; padding: 0; }
+        
+        #map { 
+        height: 100%; 
+        width: 100vw; 
+        }
+
+        #map img {
+        border: none
+        }
+                
+        .info {
+        padding: 6px 8px; 
+        background: white; 
+        background: rgba(255,255,255,0.8); 
+        box-shadow: 0 0 15px rgba(0,0,0,0.2); 
+        border-radius: 5px; 
+        }
+
+        .info h4 { 
+        font-size: 1.6em;
+        margin: 0 0 5px; 
+        color: #777;
+        }
+
+        .info span {
+        line-height: 18px;
+        vertical-align: top;
+        }
+    </style>
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+
+</head>
+<body>
+    <script>
+        var mapArticles = {
+            "type": "FeatureCollection",
+            "title": "{{ SITENAME }}",
+            "features": [
+                {% for article in dates %}
+                {% if article.metadata['lat'] and article.metadata['lon'] %}
+                {
+                    "type": "Feature",
+                    "id": "{{ article.slug }}",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [{{ article.metadata['lon'] }}, {{ article.metadata['lat'] }}]
+                    },
+                    "properties": {
+                        "title": "{{ article.title }}",
+                        "url": "{{ SITEURL }}/{{ article.url }}"
+                    }, 
+                },
+                {% endif %}
+                {% endfor %}
+            ]
+        };
+
+    </script>
+    <div id='map'></div>
+    <script>
+        const showArticles = L.geoJSON(mapArticles, {
+            pointToLayer(feature, latlng) { return L.marker(latlng);},
+            onEachFeature
+        });
+
+        const map = L.map('map').fitBounds(showArticles.getBounds());
+
+        const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        showArticles.addTo(map);
+
+        function onEachFeature(feature, layer) {
+            let popupContent = ``;
+
+            if (feature.properties && feature.properties.title) {
+                popupContent += '<a href="'+feature.properties.url+'">' + feature.properties.title + '</a>';
+            }
+
+            layer.bindPopup(popupContent);
+        }
+
+        var info = L.control({position: 'topright'});
+        var download = L.control({position: 'bottomleft'});
+
+        info.onAdd = function (map) {
+            this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+            this._div.innerHTML = '<h4>' + mapArticles["title"] + '</h4>';
+            return this._div;
+        };
+
+        download.onAdd = function (map) {
+            this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+            this._div.innerHTML = 'Download <a href="{{ SITEURL }}/articles.gpx">GPX</a> <a href="{{ SITEURL }}/articles.kml">KML</a>';
+            return this._div;
+        };
+
+        info.addTo(map);
+        download.addTo(map);
+    </script>
+</body>
+</html>
