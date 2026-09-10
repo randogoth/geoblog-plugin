@@ -1,4 +1,4 @@
-Repository moved to [codeberg.org/randogoth/geoblog-plugin.git](https://codeberg.org/randogoth/geoblog-plugin.git)
+Repository moved to [code.randogoth.com/randogoth/geoblog-plugin.git](https://code.randogoth.com/randogoth/geoblog-plugin.git)
 
 # GeoBlog Pelican Plugin
 
